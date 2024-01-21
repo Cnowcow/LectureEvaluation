@@ -1,4 +1,5 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
 <%@ page import="java.io.PrintWriter" %>
 <%@ page import="user.UserDAO" %>
 <%@ page import="evaluation.EvaluationDTO" %>
@@ -8,85 +9,99 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>강의평가 웹 사이트</title>
-    <link rel="stylesheet" href="./css/bootstrap.min.css">
-    <link rel="stylesheet" href="./css/custom.css">
+<meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+<title>강의평가 웹 사이트</title>
+<link rel="stylesheet" href="./css/bootstrap.min.css">
+<!-- 부트스트랩 -->
+<link rel="stylesheet" href="./css/custom.css"><!-- 커스텀 -->
 </head>
 <body>
 <%
-    request.setCharacterEncoding("UTF-8");
-    String lectureDivide = "전체";
-    String searchType = "최신순";
-    String search = "";
-    int pageNumber = 0;
-    if (request.getParameter("lectureDivide") != null) {
-        lectureDivide = request.getParameter("lectureDivide");
-    }
-    if (request.getParameter("searchType") != null) {
-        searchType = request.getParameter("searchType");
-    }
-    if (request.getParameter("search") != null) {
-        search = request.getParameter("search");
-    }
-    if (request.getParameter("pageNumber") != null) {
-        try {
-            pageNumber = Integer.parseInt(request.getParameter("pageNumber"));
-        } catch (Exception e) {
-            System.out.println("숫자를 입력하세요.");
-        }
-    }
-
-    String userID = null;
-    if (session.getAttribute("userID") != null) {
-        userID = (String) session.getAttribute("userID");
-    }
-
-    // 로그인하지 않은 경우
-    if (userID == null) {
-        userID = ""; // userID가 null이면 아래에서 사용할 때 nullPointerException 방지
-    } else {
-        boolean emailChecked = new UserDAO().getUserEmailChecked(userID);
-        if (!emailChecked) {
-            PrintWriter script = response.getWriter();
-            script.println("<script>");
-            script.println("location.href = 'emailSendConfirm.jsp'");
-            script.println("</script>");
-            script.close();
-            return;
-        }
-    }
+	request.setCharacterEncoding("UTF-8");
+	String lectureDivide = "전체";
+	String searchType = "최신순";
+	String search = "";
+	int pageNumber = 0;
+	if(request.getParameter("lectureDivide") != null){
+		lectureDivide = request.getParameter("lectureDivide");
+	}
+	if(request.getParameter("searchType") != null){
+		searchType = request.getParameter("searchType");
+	}
+	if(request.getParameter("search") != null){
+		search = request.getParameter("search");
+	}
+	if(request.getParameter("pageNumber") != null){
+		try{
+			pageNumber = Integer.parseInt(request.getParameter("pageNumber"));
+		}catch(Exception e){
+			System.out.println("숫자를 입력하세요.");
+		}
+	}
+	
+	String userID = null;
+	if(session.getAttribute("userID") != null){
+		userID = (String) session.getAttribute("userID");
+	}
+	if(userID == null){
+		PrintWriter script = response.getWriter();
+		script.println("<script>");
+        script.println("alert('로그인 해주세요')");
+		script.println("location.href = 'userLogin.jsp'");
+		script.println("</script>");
+		script.close();
+		return;
+	}
+	boolean emailChecked = new UserDAO().getUserEmailChecked(userID);
+	if(emailChecked == false){
+		PrintWriter script = response.getWriter();
+		script.println("<script>");
+		script.println("location.href = 'emailSendConfirm.jsp'");
+		script.println("</script>");
+		script.close();
+		return;
+	}
+%>	
+	<nav class="navbar navbar-expand-lg navbar-light bg-light">
+		<a class="navbar-brand" href="index.jsp" style="color: #FF7A6B;">강의평가 웹 사이트</a>
+		<!-- <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar"> -->
+		<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+	
+		<div id="navbar" class="collapse navbar-collapse">
+			<ul class="navbar-nav mr-auto">
+				<li class="nav-item active">
+					<a class="nav-link" href="index.jsp">메인</a>
+				</li>
+				<li class="nav-item dropdown">
+					<a class="nav-link dropdown-toggle" id="dropdown" data-bs-toggle="collapse" data-bs-target="#dropdown-menu">
+					회원관리
+					</a>
+					<div id="dropdown-menu" class="dropdown-menu" aria-labelledby="dropdown">
+<%
+	if(userID == null){
 %>
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <a class="navbar-brand" href="index.jsp" style="color: #FF7A6B;">강의평가 웹 사이트</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-    <div id="navbar" class="collapse navbar-collapse">
-        <ul class="navbar-nav mr-auto">
-            <li class="nav-item active">
-                <a class="nav-link" href="index.jsp">메인</a>
-            </li>
-            <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" id="dropdown" data-bs-toggle="collapse" data-bs-target="#dropdown-menu">
-                    회원관리
-                </a>
-                <div id="dropdown-menu" class="dropdown-menu" aria-labelledby="dropdown">
-                    <% if (userID.equals("")) { %>
-                        <a class="dropdown-item" href="userLogin.jsp">로그인</a>
-                        <a class="dropdown-item" href="userJoin.jsp">회원가입</a>
-                    <% } else { %>
-                        <a class="dropdown-item" href="userLogout.jsp">로그아웃</a>
-                    <% } %>
-                </div>
-            </li>
-        </ul>
-        <form action="./index.jsp" method="get" class="form-inline my-2 my-lg-0">
-            <input class="form-control mr-sm-1" type="text" name="search" placeholder="내용을 입력하세요." aria-labelledby="Search">
-            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">검색</button>
-        </form>
-    </div>
-</nav>
+						<a class="dropdown-item" href="userLogin.jsp">로그인</a>
+						<a class="dropdown-item" href="userJoin.jsp">회원가입</a>
+<%
+	}else{
+%>						
+						<a class="dropdown-item" href="userLogout.jsp">로그아웃</a>
+<%
+	}
+%>						
+					</div>
+				</li>
+			</ul>
+			<form action="./index.jsp" method="get" class="form-inline my-2 my-lg-0">
+				<input class="form-control mr-sm-1" type="text" name="search" placeholder="내용을 입력하세요." aria-labelledby="Search">
+				<button class="btn btn-outline-success my-2 my-sm-0" type="submit">검색</button>
+			</form>
+		</div>
+	</nav>
 	
 	<section class="container">
 		<form method="get" action="./index.jsp" class="form-inline mt-3">
