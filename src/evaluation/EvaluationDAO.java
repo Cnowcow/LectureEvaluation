@@ -99,7 +99,7 @@ public class EvaluationDAO {
 	}
 	
 	public int like(String evaluationID) {
-		String SQL = "update evaluation set likeCount = likeCount + 1 where evaluationID = ?";
+		String SQL = "UPDATE EVALUATION SET likeCount = likeCount + 1 WHERE evaluationID = ?";
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
@@ -108,7 +108,7 @@ public class EvaluationDAO {
 			conn = DatabaseUtil.getConnection();
 			pstmt = conn.prepareStatement(SQL);
 			pstmt.setInt(1, Integer.parseInt(evaluationID));
-			pstmt.executeUpdate();
+			return pstmt.executeUpdate();
 		}catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -120,7 +120,7 @@ public class EvaluationDAO {
 	}
 	
 	public int delete(String evaluationID) {
-		String SQL = "delete from evaluation where evaluationID = ?";
+		String SQL = "DELETE FROM EVALUATION WHERE evaluationID = ?";
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
@@ -129,7 +129,7 @@ public class EvaluationDAO {
 			conn = DatabaseUtil.getConnection();
 			pstmt = conn.prepareStatement(SQL);
 			pstmt.setInt(1, Integer.parseInt(evaluationID));
-			pstmt.executeUpdate();
+			return pstmt.executeUpdate();
 		}catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -141,7 +141,7 @@ public class EvaluationDAO {
 	}
 	
 	public String getUserID(String evaluationID) {
-		String SQL = "select userID from evaluation where evaluationID =?";
+		String SQL = "SELECT userID FROM EVALUATION WHERE evaluationID = ?";
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
@@ -151,6 +151,7 @@ public class EvaluationDAO {
 			pstmt = conn.prepareStatement(SQL);
 			pstmt.setInt(1, Integer.parseInt(evaluationID));
 			rs = pstmt.executeQuery();
+			
 			if(rs.next()) {
 				return rs.getString(1);
 			}
@@ -164,6 +165,5 @@ public class EvaluationDAO {
 		}
 		return null; //존재하지 않는 아이디
 	}
-
 
 }
